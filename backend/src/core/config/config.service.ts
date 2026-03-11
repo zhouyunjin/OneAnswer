@@ -37,12 +37,20 @@ export class AppConfigService {
     return this.configService.get<string>('LLM_MODEL') || 'gpt-3.5-turbo';
   }
 
+  get llmApiBase(): string {
+    return this.configService.get<string>('LLM_API_BASE') || '';
+  }
+
   get llmTemperature(): number {
     return this.configService.get<number>('LLM_TEMPERATURE') || 0.7;
   }
 
   get llmMaxTokens(): number {
     return this.configService.get<number>('LLM_MAX_TOKENS') || 2000;
+  }
+
+  get llmTimeout(): number {
+    return this.configService.get<number>('llm_timeout') || 5;
   }
 
   get logLevel(): string {

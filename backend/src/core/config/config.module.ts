@@ -4,7 +4,12 @@ import { AppConfigService } from './config.service';
 
 @Global()
 @Module({
-  imports: [NestConfigModule],
+  imports: [
+    NestConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: '.env',
+    }),
+  ],
   providers: [AppConfigService],
   exports: [AppConfigService],
 })

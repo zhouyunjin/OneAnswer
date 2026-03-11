@@ -21,15 +21,27 @@ export class SemanticEngineService implements ISemanticEngine {
       const model = this.configService.llmModel;
       const temperature = this.configService.llmTemperature;
       const maxTokens = this.configService.llmMaxTokens;
+      const apiBase = this.configService.llmApiBase;
+
+      const modelConfig: any = {
+        modelName: model,
+        temperature: Number(temperature),
+        maxTokens: Number(maxTokens),
+      };
+
+      if (apiBase) {
+        modelConfig.configuration = {
+          baseURL: apiBase,
+        };
+      }
 
       if (apiKey) {
-        this.chatModel = new ChatOpenAI({
-          openAIApiKey: apiKey,
-          modelName: model,
-          temperature,
-          maxTokens,
-        });
+        modelConfig.openAIApiKey = apiKey;
+        this.chatModel = new ChatOpenAI(modelConfig);
         this.logger.log('LLM model initialized successfully');
+      } else if (apiBase) {
+        this.chatModel = new ChatOpenAI(modelConfig);
+        this.logger.log('LLM model initialized with custom API base');
       } else {
         this.logger.warn('LLM API key not configured, using fallback logic');
       }

@@ -9,13 +9,14 @@ import { Converter } from './entities/converter.entity';
 import { LFFurnace } from './entities/lf-furnace.entity';
 import { ContinuousCaster } from './entities/continuous-caster.entity';
 import { Alarm } from './entities/alarm.entity';
+import * as path from 'path';
 
 @Module({
   imports: [
     ConfigModule,
     TypeOrmModule.forRoot({
       type: 'better-sqlite3',
-      database: 'database.sqlite',
+      database: process.cwd() + '/database.sqlite',
       entities: [
         HotMetal,
         Converter,
