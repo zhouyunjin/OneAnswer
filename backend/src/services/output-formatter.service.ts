@@ -29,6 +29,14 @@ export class OutputFormatterService implements IOutputFormatter {
         return this.generateProductionStatusSummary(data);
       case QueryIntent.ALARM_EXCEPTION:
         return this.generateAlarmSummary(data);
+      case QueryIntent.QUALITY_DATA:
+        return this.generateQualitySummary(data);
+      case QueryIntent.EQUIPMENT_MANAGEMENT:
+        return this.generateEquipmentSummary(data);
+      case QueryIntent.ENERGY_CONSUMPTION:
+        return this.generateEnergySummary(data);
+      case QueryIntent.MATERIAL_MANAGEMENT:
+        return this.generateMaterialSummary(data);
       default:
         return '查询完成';
     }
@@ -89,5 +97,62 @@ export class OutputFormatterService implements IOutputFormatter {
 
     const total = hotMetalData.reduce((sum: number, item: any) => sum + item.temperature, 0);
     return Math.round(total / hotMetalData.length);
+  }
+
+  private generateQualitySummary(data: any): string {
+    if (!data.quality || data.quality.length === 0) {
+      return '未找到相关质量数据。';
+    }
+
+    const stats = data.statistics;
+    if (stats) {
+      return `共查询到${stats.total}条质量数据，合格${stats.qualified}条，不合格${stats.unqualified}条，合格率${stats.qualifiedRate}%。`;
+    }
+
+    return `共查询到${data.quality.length}条质量数据。`;
+  }
+
+  private generateEquipmentSummary(data: any): string {
+    if (!data.equipment || data.equipment.length === 0) {
+      return '未找到相关设备数据。';
+    }
+
+    const stats = data.statistics;
+    if (stats) {
+      return `共${stats.total}台设备，运行中${stats.running}台，待机${stats.standby}台，检修${stats.maintenance}台，故障${stats.fault}台，运行率${stats.runningRate}%。`;
+    }
+
+    return `共查询到${data.equipment.length}台设备数据。`;
+  }
+
+  private generateEnergySummary(data: any): string {
+    if (!data.energy || data.energy.length === 0) {
+      return '未找到相关能耗数据。';
+    }
+
+    const stats = data.statistics;
+    if (stats) {
+      return `总能耗${stats.totalConsumption.toFixed(2)}，总成本${stats.totalCost.toFixed(2)}元，平均吨钢能耗${stats.averageConsumptionPerTon}。`;
+    }
+
+    return `共查询到${data.energy.length}条能耗数据。`;
+  }
+
+  private generateMaterialSummary(data: any): string {
+    if (!data.materials || data.materials.length === 0) {
+      return '未找到相关物料数据。';
+    }
+
+    const stats = data.statistics;
+    if (stats) {
+      let summary = `共${stats.totalTypes}种物料，总价值${stats.totalValue.toFixed(2)}元`;
+      if (stats.lowStockCount > 0) {
+        summary += `，其中${stats.lowStockCount}种物料库存不足`;
+      }
+      summary += '。';
+      return summary;
+    }
+
+    return `共查询到${data.materials.length}种物料数据。`;
   }
 }

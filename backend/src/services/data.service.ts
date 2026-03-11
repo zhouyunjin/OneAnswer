@@ -6,6 +6,10 @@ import { Converter } from '../entities/converter.entity';
 import { LFFurnace } from '../entities/lf-furnace.entity';
 import { ContinuousCaster } from '../entities/continuous-caster.entity';
 import { Alarm } from '../entities/alarm.entity';
+import { Quality } from '../entities/quality.entity';
+import { Equipment } from '../entities/equipment.entity';
+import { Energy } from '../entities/energy.entity';
+import { Material } from '../entities/material.entity';
 import { QueryIntent } from '../core/enums/query-intent.enum';
 import { QueryParams, QueryResult } from '../core/interfaces/query.interface';
 import { IDataService } from '../core/interfaces/data-service.interface';
@@ -25,6 +29,14 @@ export class DataService implements IDataService {
     private readonly continuousCasterRepository: Repository<ContinuousCaster>,
     @InjectRepository(Alarm)
     private readonly alarmRepository: Repository<Alarm>,
+    @InjectRepository(Quality)
+    private readonly qualityRepository: Repository<Quality>,
+    @InjectRepository(Equipment)
+    private readonly equipmentRepository: Repository<Equipment>,
+    @InjectRepository(Energy)
+    private readonly energyRepository: Repository<Energy>,
+    @InjectRepository(Material)
+    private readonly materialRepository: Repository<Material>,
   ) {}
 
   async query(intent: QueryIntent, params: QueryParams): Promise<QueryResult> {
@@ -33,6 +45,14 @@ export class DataService implements IDataService {
         return this.queryProductionStatus(params);
       case QueryIntent.ALARM_EXCEPTION:
         return this.queryAlarms(params);
+      case QueryIntent.QUALITY_DATA:
+        return this.queryQuality(params);
+      case QueryIntent.EQUIPMENT_MANAGEMENT:
+        return this.queryEquipment(params);
+      case QueryIntent.ENERGY_CONSUMPTION:
+        return this.queryEnergy(params);
+      case QueryIntent.MATERIAL_MANAGEMENT:
+        return this.queryMaterial(params);
       default:
         return this.queryProductionStatus(params);
     }
@@ -45,11 +65,11 @@ export class DataService implements IDataService {
   private async queryProductionStatus(params: QueryParams): Promise<QueryResult> {
     const data: any = {};
 
-    if (params.materialType === 'hot_metal' || !params.materialType) {
+    if (!params.materialType || params.materialType === 'hot_metal' || params.materialType === '铁水') {
       data.hotMetal = await this.queryHotMetal(params);
     }
 
-    if (!params.materialType || params.materialType === 'production') {
+    if (!params.materialType || params.materialType === 'production' || params.materialType === '生产') {
       data.converters = await this.queryConverters(params);
       data.lfFurnaces = await this.queryLFFurnaces(params);
       data.continuousCasters = await this.queryContinuousCasters(params);
@@ -87,6 +107,161 @@ export class DataService implements IDataService {
       data: {
         alarms,
         count: alarms.length,
+      },
+    };
+  }
+
+  private async queryQuality(params: QueryParams): Promise<QueryResult> {
+    const queryBuilder = this.qualityRepository.createQueryBuilder('quality');
+
+    if (params.timeRange?.duration) {
+      const timeRange = this.parseTimeRange(params.timeRange.duration);
+      if (timeRange) {
+        queryBuilder.andWhere('quality.timestamp BETWEEN :start AND :end', {
+          start: timeRange.start,
+          end: timeRange.end,
+        });
+      }
+    }
+
+    if (params.steelGrade) {
+      queryBuilder.andWhere('quality.steelGrade = :steelGrade', {
+        steelGrade: params.steelGrade,
+      });
+    }
+
+    const quality = await queryBuilder.orderBy('quality.timestamp', 'DESC').getMany();
+
+    const qualified = quality.filter(q => q.qualified).length;
+    const total = quality.length;
+
+    return {
+      intentType: QueryIntent.QUALITY_DATA,
+      data: {
+        quality,
+        statistics: {
+          total,
+          qualified,
+          unqualified: total - qualified,
+          qualifiedRate: total > 0 ? ((qualified / total) * 100).toFixed(2) : '0',
+        },
+      },
+    };
+  }
+
+  private async queryEquipment(params: QueryParams): Promise<QueryResult> {
+    const queryBuilder = this.equipmentRepository.createQueryBuilder('equipment');
+
+    if (params.deviceIds && params.deviceIds.length > 0) {
+      queryBuilder.andWhere('equipment.equipmentId IN (:...ids)', {
+        ids: params.deviceIds,
+      });
+    }
+
+    if (params.equipmentType) {
+      queryBuilder.andWhere('equipment.equipmentType = :type', {
+        type: params.equipmentType,
+      });
+    }
+
+    const equipment = await queryBuilder.getMany();
+
+    const running = equipment.filter(e => e.status === '运行中').length;
+    const standby = equipment.filter(e => e.status === '待机').length;
+    const maintenance = equipment.filter(e => e.status === '检修').length;
+    const fault = equipment.filter(e => e.status === '故障').length;
+
+    return {
+      intentType: QueryIntent.EQUIPMENT_MANAGEMENT,
+      data: {
+        equipment,
+        statistics: {
+          total: equipment.length,
+          running,
+          standby,
+          maintenance,
+          fault,
+          runningRate: equipment.length > 0 ? ((running / equipment.length) * 100).toFixed(2) : '0',
+        },
+      },
+    };
+  }
+
+  private async queryEnergy(params: QueryParams): Promise<QueryResult> {
+    const queryBuilder = this.energyRepository.createQueryBuilder('energy');
+
+    if (params.timeRange?.duration) {
+      const timeRange = this.parseTimeRange(params.timeRange.duration);
+      if (timeRange) {
+        queryBuilder.andWhere('energy.timestamp BETWEEN :start AND :end', {
+          start: timeRange.start,
+          end: timeRange.end,
+        });
+      }
+    }
+
+    if (params.energyType) {
+      queryBuilder.andWhere('energy.energyType = :type', {
+        type: params.energyType,
+      });
+    }
+
+    if (params.department) {
+      queryBuilder.andWhere('energy.department = :dept', {
+        dept: params.department,
+      });
+    }
+
+    const energy = await queryBuilder.orderBy('energy.timestamp', 'DESC').getMany();
+
+    const totalConsumption = energy.reduce((sum, e) => sum + e.consumption, 0);
+    const totalCost = energy.reduce((sum, e) => sum + e.cost, 0);
+
+    const byType: Record<string, number> = {};
+    energy.forEach(e => {
+      byType[e.energyType] = (byType[e.energyType] || 0) + e.consumption;
+    });
+
+    return {
+      intentType: QueryIntent.ENERGY_CONSUMPTION,
+      data: {
+        energy,
+        statistics: {
+          totalConsumption,
+          totalCost,
+          averageConsumptionPerTon: energy.length > 0 
+            ? (energy.reduce((sum, e) => sum + (e.consumptionPerTon || 0), 0) / energy.length).toFixed(2)
+            : '0',
+          byType,
+        },
+      },
+    };
+  }
+
+  private async queryMaterial(params: QueryParams): Promise<QueryResult> {
+    const queryBuilder = this.materialRepository.createQueryBuilder('material');
+
+    if (params.materialType) {
+      queryBuilder.andWhere('material.materialType = :type', {
+        type: params.materialType,
+      });
+    }
+
+    const materials = await queryBuilder.getMany();
+
+    const lowStock = materials.filter(m => m.stock < m.minStock);
+    const totalValue = materials.reduce((sum, m) => sum + m.stock * m.unitPrice, 0);
+
+    return {
+      intentType: QueryIntent.MATERIAL_MANAGEMENT,
+      data: {
+        materials,
+        statistics: {
+          totalTypes: materials.length,
+          lowStockCount: lowStock.length,
+          totalValue,
+          lowStockItems: lowStock,
+        },
       },
     };
   }

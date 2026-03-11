@@ -10,6 +10,9 @@ export interface QueryParams {
   materialType?: string;
   steelGrade?: string;
   processType?: string;
+  equipmentType?: string;
+  energyType?: string;
+  department?: string;
   [key: string]: any;
 }
 

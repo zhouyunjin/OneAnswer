@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { QueryRequestDto } from '../../api/dto/query-request.dto';
 import { SemanticEngineService } from '../../services/semantic-engine.service';
 import { OutputFormatterService } from '../../services/output-formatter.service';
+import { DataService } from '../../services/data.service';
 import { QueryIntent } from '../../core/enums/query-intent.enum';
 import { QueryParams } from '../../core/interfaces/query.interface';
 
@@ -19,6 +20,7 @@ export class QueryService {
   constructor(
     private readonly semanticEngine: SemanticEngineService,
     private readonly outputFormatter: OutputFormatterService,
+    private readonly dataService: DataService,
   ) {}
 
   async processQuery(request: QueryRequestDto): Promise<any> {
@@ -36,16 +38,8 @@ export class QueryService {
     const intent = await this.semanticEngine.classifyIntent(request.query);
     const params = await this.semanticEngine.extractParameters(request.query, intent);
 
-    const formattedResult = this.outputFormatter.format({
-      intentType: intent,
-      data: [],
-    });
-
-    let data: any = formattedResult.data || [];
-    
-    if (intent === QueryIntent.ALARM_EXCEPTION) {
-      data = { alarms: [] };
-    }
+    const queryResult = await this.dataService.query(intent, params);
+    const formattedResult = this.outputFormatter.format(queryResult);
 
     const result = {
       queryId,
@@ -57,11 +51,11 @@ export class QueryService {
         ...params,
       },
       result: {
-        data: data,
+        data: formattedResult.data || [],
         summary: formattedResult.summary || `查询结果：${request.query}`,
         metadata: {
           queryTime: Date.now() - startTime,
-          recordCount: 0,
+          recordCount: this.countRecords(formattedResult.data),
           timestamp: new Date().toISOString(),
           intentType: intent,
           dataSource: 'production_db',
@@ -100,5 +94,24 @@ export class QueryService {
 
   private generateQueryId(): string {
     return `Q${Date.now()}${Math.random().toString(36).substr(2, 9)}`;
+  }
+
+  private countRecords(data: any): number {
+    if (!data || typeof data !== 'object') {
+      return 0;
+    }
+
+    if (Array.isArray(data)) {
+      return data.length;
+    }
+
+    let count = 0;
+    for (const key in data) {
+      if (Array.isArray(data[key])) {
+        count += data[key].length;
+      }
+    }
+
+    return count;
   }
 }

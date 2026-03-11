@@ -1,0 +1,142 @@
+.report-page {
+  padding: 24px;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+.report-header {
+  text-align: center;
+  margin-bottom: 32px;
+  animation: fadeIn 0.6s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.report-header h2 {
+  font-size: 32px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 12px;
+}
+
+.report-config-card,
+.report-preview-card {
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  height: 100%;
+}
+
+.report-config-card .ant-card-head,
+.report-preview-card .ant-card-head {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-bottom: none;
+  padding: 16px 20px;
+}
+
+.report-config-card .ant-card-head-title,
+.report-preview-card .ant-card-head-title {
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.report-config-card .ant-card-body,
+.report-preview-card .ant-card-body {
+  padding: 20px;
+}
+
+.empty-preview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  color: #9ca3af;
+}
+
+.empty-icon {
+  font-size: 64px;
+  color: #d1d5db;
+  margin-bottom: 16px;
+}
+
+.preview-stats {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.preview-stats .ant-statistic-title {
+  font-size: 12px;
+  color: #6b7280;
+  margin-bottom: 8px;
+}
+
+.preview-stats .ant-statistic-content {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.preview-stats .ant-statistic-content-prefix {
+  margin-right: 8px;
+  color: #667eea;
+}
+
+.preview-stats .ant-statistic-content-suffix {
+  margin-left: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #6b7280;
+}
+
+@media (max-width: 1200px) {
+  .report-page {
+    padding: 16px;
+  }
+
+  .report-header h2 {
+    font-size: 24px;
+  }
+
+  .report-config-card .ant-card-body,
+  .report-preview-card .ant-card-body {
+    padding: 16px;
+  }
+
+  .preview-stats .ant-statistic-content {
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .report-page {
+    padding: 12px;
+  }
+
+  .report-header h2 {
+    font-size: 20px;
+  }
+
+  .report-config-card .ant-card-body,
+  .report-preview-card .ant-card-body {
+    padding: 12px;
+  }
+
+  .preview-stats .ant-statistic-content {
+    font-size: 18px;
+  }
+}

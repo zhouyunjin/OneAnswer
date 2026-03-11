@@ -9,6 +9,10 @@ import { Converter } from './entities/converter.entity';
 import { LFFurnace } from './entities/lf-furnace.entity';
 import { ContinuousCaster } from './entities/continuous-caster.entity';
 import { Alarm } from './entities/alarm.entity';
+import { Quality } from './entities/quality.entity';
+import { Equipment } from './entities/equipment.entity';
+import { Energy } from './entities/energy.entity';
+import { Material } from './entities/material.entity';
 import * as path from 'path';
 
 @Module({
@@ -23,6 +27,10 @@ import * as path from 'path';
         LFFurnace,
         ContinuousCaster,
         Alarm,
+        Quality,
+        Equipment,
+        Energy,
+        Material,
       ],
       synchronize: true,
     }),

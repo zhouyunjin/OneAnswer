@@ -7,17 +7,24 @@ export interface QueryRequest {
 }
 
 export interface QueryResponse {
-  success: boolean
-  data?: {
-    queryId: string
-    answer: string
-    intent: string
-    intentType: string
-    parameters: Record<string, any>
-    structuredOutput?: Record<string, any>
-    timestamp: string
+  queryId: string
+  intent: string
+  intentType: string
+  parameters: Record<string, any>
+  result: {
+    data: any[]
+    summary: string
+    metadata: {
+      queryTime: number
+      recordCount: number
+      timestamp: string
+      intentType: string
+      dataSource: string
+    }
   }
-  error?: string
+  processingTime: number
+  fromCache: boolean
+  timestamp: string
 }
 
 export interface Tab {

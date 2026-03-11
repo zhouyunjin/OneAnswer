@@ -59,12 +59,19 @@ export class SemanticEngineService implements ISemanticEngine {
       const systemPrompt = `你是一个炼钢行业智能问答系统的意图分类器。你的任务是识别用户查询的意图类型。
 
 支持的意图类型：
-- production_status: 生产状态查询（铁水情况、冶炼状态、钢水情况等）
-- quality_data: 质量数据查询（成分分析、质量指标等）
-- equipment: 设备管理查询（设备状态、维护记录等）
-- material: 物料管理查询（合金、辅料库存等）
-- energy: 能耗统计查询（电耗、氧气消耗等）
-- alarm: 异常报警查询（设备故障、温度超限等）
+- production_status: 生产状态查询（铁水情况、冶炼状态、钢水情况、生产进度等）
+- quality_data: 质量数据查询（成分分析、质量指标、合格率、检验结果、钢种质量等）
+- equipment: 设备管理查询（设备状态、维护记录、设备效率、检修计划等）
+- material: 物料管理查询（合金库存、辅料库存、造渣剂、脱氧剂等）
+- energy: 能耗统计查询（电耗、氧气消耗、天然气消耗、蒸汽消耗等）
+- alarm: 异常报警查询（设备故障、温度超限、压力异常等）
+
+重要规则：
+1. 当查询包含"质量"、"成分"、"合格率"、"检验"、"钢种"等关键词时，必须返回 quality_data
+2. 当查询包含"设备"、"检修"、"维护"、"运行状态"等关键词时，必须返回 equipment
+3. 当查询包含"库存"、"合金"、"辅料"、"物料"等关键词时，必须返回 material
+4. 当查询包含"能耗"、"电耗"、"氧气"、"天然气"等关键词时，必须返回 energy
+5. 当查询包含"报警"、"异常"、"故障"、"超限"等关键词时，必须返回 alarm
 
 请只返回意图类型的英文代码，不要返回其他内容。`;
 
@@ -118,20 +125,23 @@ export class SemanticEngineService implements ISemanticEngine {
   private fallbackClassifyIntent(query: string): QueryIntent {
     const lowerQuery = query.toLowerCase();
 
-    if (lowerQuery.includes('报警') || lowerQuery.includes('异常') || lowerQuery.includes('故障')) {
+    if (lowerQuery.includes('报警') || lowerQuery.includes('异常') || lowerQuery.includes('故障') || lowerQuery.includes('超限')) {
       return QueryIntent.ALARM_EXCEPTION;
     }
-    if (lowerQuery.includes('合金') || lowerQuery.includes('辅料') || lowerQuery.includes('库存')) {
+    if (lowerQuery.includes('合金') || lowerQuery.includes('辅料') || lowerQuery.includes('库存') || lowerQuery.includes('物料') || lowerQuery.includes('造渣剂') || lowerQuery.includes('脱氧剂')) {
       return QueryIntent.MATERIAL_MANAGEMENT;
     }
-    if (lowerQuery.includes('质量') || lowerQuery.includes('成分') || lowerQuery.includes('合格率')) {
+    if (lowerQuery.includes('质量') || lowerQuery.includes('成分') || lowerQuery.includes('合格率') || lowerQuery.includes('检验') || lowerQuery.includes('钢种')) {
       return QueryIntent.QUALITY_DATA;
     }
-    if (lowerQuery.includes('设备') || lowerQuery.includes('检修') || lowerQuery.includes('维护')) {
+    if (lowerQuery.includes('设备') || lowerQuery.includes('检修') || lowerQuery.includes('维护') || lowerQuery.includes('运行状态') || lowerQuery.includes('效率')) {
       return QueryIntent.EQUIPMENT_MANAGEMENT;
     }
-    if (lowerQuery.includes('能耗') || lowerQuery.includes('电耗') || lowerQuery.includes('氧气')) {
+    if (lowerQuery.includes('能耗') || lowerQuery.includes('电耗') || lowerQuery.includes('氧气') || lowerQuery.includes('天然气') || lowerQuery.includes('蒸汽') || lowerQuery.includes('水耗')) {
       return QueryIntent.ENERGY_CONSUMPTION;
+    }
+    if (lowerQuery.includes('铁水') || lowerQuery.includes('冶炼') || lowerQuery.includes('转炉') || lowerQuery.includes('lf炉') || lowerQuery.includes('连铸') || lowerQuery.includes('生产')) {
+      return QueryIntent.PRODUCTION_STATUS;
     }
 
     return QueryIntent.PRODUCTION_STATUS;
@@ -162,6 +172,7 @@ export class SemanticEngineService implements ISemanticEngine {
       /(\d+)号转炉|转炉(\d+)/,
       /(\d+)号LF炉|LF炉(\d+)/,
       /(\d+)号连铸|连铸(\d+)/,
+      /(\d+)号高炉|高炉(\d+)/,
     ];
 
     for (const pattern of devicePatterns) {
@@ -182,6 +193,38 @@ export class SemanticEngineService implements ISemanticEngine {
     const gradeMatch = query.match(steelGradePattern);
     if (gradeMatch) {
       params.steelGrade = gradeMatch[0];
+    }
+
+    if (lowerQuery.includes('转炉')) {
+      params.equipmentType = '转炉';
+    } else if (lowerQuery.includes('lf炉') || lowerQuery.includes('lf')) {
+      params.equipmentType = 'LF炉';
+    } else if (lowerQuery.includes('连铸机') || lowerQuery.includes('连铸')) {
+      params.equipmentType = '连铸机';
+    }
+
+    if (lowerQuery.includes('氧气')) {
+      params.energyType = '氧气';
+    } else if (lowerQuery.includes('电力') || lowerQuery.includes('电耗')) {
+      params.energyType = '电力';
+    } else if (lowerQuery.includes('天然气')) {
+      params.energyType = '天然气';
+    } else if (lowerQuery.includes('循环水') || lowerQuery.includes('水耗')) {
+      params.energyType = '循环水';
+    } else if (lowerQuery.includes('压缩空气')) {
+      params.energyType = '压缩空气';
+    } else if (lowerQuery.includes('蒸汽')) {
+      params.energyType = '蒸汽';
+    }
+
+    if (lowerQuery.includes('转炉车间')) {
+      params.department = '转炉车间';
+    } else if (lowerQuery.includes('精炼车间')) {
+      params.department = '精炼车间';
+    } else if (lowerQuery.includes('连铸车间')) {
+      params.department = '连铸车间';
+    } else if (lowerQuery.includes('公辅系统') || lowerQuery.includes('公辅')) {
+      params.department = '公辅系统';
     }
 
     return params;
