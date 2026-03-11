@@ -1,31 +1,83 @@
 version: '3.8'
 
 services:
+  # 后端服务
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
+    container_name: one-answer-backend
+    restart: unless-stopped
     ports:
       - "3000:3000"
     environment:
       - NODE_ENV=production
       - PORT=3000
+      - DB_PATH=/app/data/one-answer.db
+      - LLM_API_KEY=${LLM_API_KEY}
+      - LLM_BASE_URL=${LLM_BASE_URL}
+      - LLM_MODEL=${LLM_MODEL:-minimax-text-01}
     volumes:
-      - ./backend/database.sqlite:/app/database.sqlite
+      # 数据持久化：SQLite 数据库
+      - ./data:/app/data
+      # 日志持久化
+      - ./logs:/app/logs
     networks:
       - one-answer-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
+  # 前端服务
   frontend:
     build:
       context: ./frontend/one-answer-frontend
       dockerfile: Dockerfile
+    container_name: one-answer-frontend
+    restart: unless-stopped
     ports:
       - "80:80"
+    environment:
+      - NODE_ENV=production
+      - VITE_API_BASE_URL=http://backend:3000
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
     networks:
       - one-answer-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # 可选：Nginx 反向代理（用于生产环境 HTTPS）
+  # nginx:
+  #   image: nginx:alpine
+  #   container_name: one-answer-nginx
+  #   restart: unless-stopped
+  #   ports:
+  #     - "443:443"
+  #     - "80:80"
+  #   volumes:
+  #     - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+  #     - ./nginx/ssl:/etc/nginx/ssl:ro
+  #   depends_on:
+  #     - frontend
+  #     - backend
+  #   networks:
+  #     - one-answer-network
 
 networks:
   one-answer-network:
     driver: bridge
+
+volumes:
+  data:
+    driver: local
+  logs:
+    driver: local

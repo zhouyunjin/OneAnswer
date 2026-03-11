@@ -197,24 +197,26 @@ export class SemanticEngineService implements ISemanticEngine {
 
     if (lowerQuery.includes('转炉')) {
       params.equipmentType = '转炉';
-    } else if (lowerQuery.includes('lf炉') || lowerQuery.includes('lf')) {
-      params.equipmentType = 'LF炉';
+    } else if (lowerQuery.includes('lf 炉') || lowerQuery.includes('lf')) {
+      params.equipmentType = 'LF 炉';
     } else if (lowerQuery.includes('连铸机') || lowerQuery.includes('连铸')) {
       params.equipmentType = '连铸机';
     }
 
-    if (lowerQuery.includes('氧气')) {
-      params.energyType = '氧气';
-    } else if (lowerQuery.includes('电力') || lowerQuery.includes('电耗')) {
-      params.energyType = '电力';
-    } else if (lowerQuery.includes('天然气')) {
-      params.energyType = '天然气';
-    } else if (lowerQuery.includes('循环水') || lowerQuery.includes('水耗')) {
-      params.energyType = '循环水';
-    } else if (lowerQuery.includes('压缩空气')) {
-      params.energyType = '压缩空气';
-    } else if (lowerQuery.includes('蒸汽')) {
-      params.energyType = '蒸汽';
+    if (intent === QueryIntent.ENERGY_CONSUMPTION) {
+      if (lowerQuery.includes('氧气')) {
+        params.energyType = '氧气';
+      } else if (lowerQuery.includes('电力') || lowerQuery.includes('电耗')) {
+        params.energyType = '电力';
+      } else if (lowerQuery.includes('天然气')) {
+        params.energyType = '天然气';
+      } else if (lowerQuery.includes('循环水') || lowerQuery.includes('水耗')) {
+        params.energyType = '循环水';
+      } else if (lowerQuery.includes('压缩空气')) {
+        params.energyType = '压缩空气';
+      } else if (lowerQuery.includes('蒸汽')) {
+        params.energyType = '蒸汽';
+      }
     }
 
     if (lowerQuery.includes('转炉车间')) {

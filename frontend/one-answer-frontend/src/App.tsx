@@ -1,9 +1,10 @@
 import { useState, useRef, useEffect } from 'react'
-import { Layout, Input, Button, Card, Space, Spin, Avatar, Divider, Tag, Tabs, Menu } from 'antd'
-import { SendOutlined, LoadingOutlined, UserOutlined, RobotOutlined, FireOutlined, ThunderboltOutlined, AlertOutlined, DashboardOutlined, ExperimentOutlined, InboxOutlined, SettingOutlined, PlayCircleOutlined, FileTextOutlined, FileExcelOutlined, DownloadOutlined } from '@ant-design/icons'
+import { Layout, Input, Button, Card, Space, Spin, Avatar, Divider, Tag, Tabs, Menu, Collapse } from 'antd'
+import { SendOutlined, LoadingOutlined, UserOutlined, RobotOutlined, FireOutlined, ThunderboltOutlined, AlertOutlined, DashboardOutlined, ExperimentOutlined, InboxOutlined, SettingOutlined, PlaySquareOutlined, BookOutlined, BulbOutlined, FileExcelOutlined, DownloadOutlined, MenuFoldOutlined, MenuUnfoldOutlined, RocketOutlined, FileTextOutlined, CodeOutlined, GlobalOutlined } from '@ant-design/icons'
 import './App.css'
 import DemoPage from './DemoPage'
-import DocsPage from './DocsPage'
+import ProductTechPage from './ProductTechPage'
+import MarkdownPage from './MarkdownPage'
 
 const { Header, Content, Sider } = Layout
 
@@ -33,7 +34,8 @@ interface Template {
 
 function App() {
   const [activeTab, setActiveTab] = useState('production')
-  const [activeMenu, setActiveMenu] = useState('chat')
+  const [activeMenu, setActiveMenu] = useState('product-intro')
+  const [menuCollapsed, setMenuCollapsed] = useState(false)
   const [query, setQuery] = useState('')
   const [loading, setLoading] = useState(false)
   const [messages, setMessages] = useState<Message[]>([])
@@ -495,24 +497,6 @@ function App() {
 
   const currentTemplates = templates.filter((t) => t.tab === activeTab)
 
-  const menuItems = [
-    {
-      key: 'chat',
-      icon: <RobotOutlined />,
-      label: '智能问答',
-    },
-    {
-      key: 'demo',
-      icon: <PlayCircleOutlined />,
-      label: 'Demo演示',
-    },
-    {
-      key: 'docs',
-      icon: <FileTextOutlined />,
-      label: '产品文档',
-    },
-  ]
-
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }
@@ -691,25 +675,135 @@ function App() {
     <Layout className="chat-layout">
       <Header className="chat-header">
         <div className="header-content">
-          <RobotOutlined className="header-icon" />
-          <div className="header-text">
-            <h1 className="header-title">OneAnswer</h1>
-            <span className="header-subtitle">炼钢行业智能问答系统</span>
+          <div className="header-left">
+            <div className="header-icon-wrapper">
+              <GlobalOutlined className="header-icon" />
+            </div>
+            <div className="header-text">
+              <h1 className="header-title">OneAnswer</h1>
+              <span className="header-subtitle">炼钢行业智能问答系统</span>
+            </div>
+          </div>
+          <div className="header-right">
+            <span className="header-version">v1.0</span>
           </div>
         </div>
       </Header>
       <Layout className="chat-body">
-        <Sider width={80} className="menu-sider">
-          <Menu
-            mode="vertical"
-            selectedKeys={[activeMenu]}
-            items={menuItems}
-            onClick={({ key }) => setActiveMenu(key)}
-            className="side-menu"
-          />
+        <Sider width={menuCollapsed ? 80 : 240} className="menu-sider">
+          <div className="menu-toggle" onClick={() => setMenuCollapsed(!menuCollapsed)}>
+            {menuCollapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+          </div>
+          {menuCollapsed ? (
+            <Menu
+              mode="vertical"
+              selectedKeys={[activeMenu]}
+              onClick={({ key }) => setActiveMenu(key)}
+              className="side-menu"
+              items={[
+                {
+                  key: 'product-intro',
+                  icon: <FileTextOutlined />,
+                  label: '产品介绍',
+                },
+                {
+                  key: 'demo',
+                  icon: <PlaySquareOutlined />,
+                  label: '产品效果示例',
+                },
+                {
+                  key: 'requirements',
+                  icon: <BookOutlined />,
+                  label: '需求设计说明',
+                },
+                {
+                  key: 'design',
+                  icon: <CodeOutlined />,
+                  label: '技术设计说明',
+                },
+                {
+                  type: 'divider',
+                },
+                {
+                  key: 'oneanswer',
+                  icon: <RocketOutlined />,
+                  label: 'OneAnswer',
+                },
+              ]}
+            />
+          ) : (
+            <Collapse
+              defaultActiveKey={['design', 'try']}
+              bordered={false}
+              className="menu-collapse"
+              expandIcon={() => null}
+            >
+              <Collapse.Panel 
+                header={
+                  <div className="collapse-header">
+                    <BulbOutlined className="collapse-icon" />
+                    <span className="collapse-title">设计</span>
+                  </div>
+                } 
+                key="design"
+              >
+                <Menu
+                  mode="vertical"
+                  selectedKeys={[activeMenu]}
+                  onClick={({ key }) => setActiveMenu(key)}
+                  className="design-menu"
+                  items={[
+                    {
+                      key: 'product-intro',
+                      icon: <FileTextOutlined />,
+                      label: '产品介绍',
+                    },
+                    {
+                      key: 'demo',
+                      icon: <PlaySquareOutlined />,
+                      label: '产品效果示例',
+                    },
+                    {
+                      key: 'requirements',
+                      icon: <BookOutlined />,
+                      label: '需求设计说明',
+                    },
+                    {
+                      key: 'design',
+                      icon: <CodeOutlined />,
+                      label: '技术设计说明',
+                    },
+                  ]}
+                />
+              </Collapse.Panel>
+              <Collapse.Panel 
+                header={
+                  <div className="collapse-header">
+                    <RocketOutlined className="collapse-icon" />
+                    <span className="collapse-title">立即试用</span>
+                  </div>
+                } 
+                key="try"
+              >
+                <Menu
+                  mode="vertical"
+                  selectedKeys={[activeMenu]}
+                  onClick={({ key }) => setActiveMenu(key)}
+                  className="design-menu"
+                  items={[
+                    {
+                      key: 'oneanswer',
+                      icon: <RocketOutlined />,
+                      label: 'OneAnswer',
+                    },
+                  ]}
+                />
+              </Collapse.Panel>
+            </Collapse>
+          )}
         </Sider>
-        <Content className={`chat-content ${activeMenu === 'chat' ? 'chat-mode' : ''}`}>
-          {activeMenu === 'chat' && (
+        <Content className={`chat-content ${activeMenu === 'oneanswer' ? 'chat-mode' : ''}`}>
+          {activeMenu === 'oneanswer' && (
             <>
               <div className="chat-messages">
                 {messages.length === 0 && (
@@ -759,9 +853,19 @@ function App() {
                             if (line.startsWith('- ')) {
                               return (
                                 <div key={index} className="message-list-item">
-                                  {line.substring(2)}
+                                  {line.replace('- ', '')}
                                 </div>
                               )
+                            }
+                            if (line.match(/^\d+\.\s/)) {
+                              return (
+                                <div key={index} className="message-list-item">
+                                  {line}
+                                </div>
+                              )
+                            }
+                            if (line.trim() === '') {
+                              return <br key={index} />
                             }
                             return <div key={index}>{line}</div>
                           })}
@@ -789,8 +893,9 @@ function App() {
                   <div className="message assistant-message">
                     <div className="message-content">
                       <Avatar icon={<RobotOutlined />} className="message-avatar assistant" />
-                      <div className="message-bubble">
-                        <Spin indicator={<LoadingOutlined spin />} className="loading-spinner" />
+                      <div className="message-bubble loading">
+                        <Spin size="small" />
+                        <span className="loading-text">正在思考...</span>
                       </div>
                     </div>
                   </div>
@@ -807,12 +912,17 @@ function App() {
               </div>
 
               <div className="chat-input-container">
-                <div className="chat-input-wrapper">
+                <div className="input-wrapper">
                   <Input.TextArea
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
-                    onKeyPress={handleKeyPress}
-                    placeholder="输入您的问题，按 Enter 发送..."
+                    onPressEnter={(e) => {
+                      if (!e.shiftKey) {
+                        e.preventDefault()
+                        handleQuerySubmit()
+                      }
+                    }}
+                    placeholder="请输入您的问题，例如：查询今天转炉的生产状态"
                     autoSize={{ minRows: 1, maxRows: 4 }}
                     className="chat-input"
                   />
@@ -830,11 +940,13 @@ function App() {
               </div>
             </>
           )}
+          {activeMenu === 'product-intro' && <ProductTechPage onTryNow={() => setActiveMenu('oneanswer')} />}
           {activeMenu === 'demo' && <DemoPage />}
-          {activeMenu === 'docs' && <DocsPage />}
+          {activeMenu === 'requirements' && <MarkdownPage filePath="/requirements.md" title="需求设计说明" />}
+          {activeMenu === 'design' && <MarkdownPage filePath="/design.md" title="技术设计说明" />}
         </Content>
-        <Sider width={320} className="recommendation-sider">
-          {activeMenu === 'chat' && (
+        {activeMenu === 'oneanswer' && (
+          <Sider width={320} className="recommendation-sider">
             <div className="recommendation-content">
               <div className="categories-header">
                 <div className="categories-title">推荐指令</div>
@@ -869,8 +981,8 @@ function App() {
                 ))}
               </div>
             </div>
-          )}
-        </Sider>
+          </Sider>
+        )}
       </Layout>
     </Layout>
   )
