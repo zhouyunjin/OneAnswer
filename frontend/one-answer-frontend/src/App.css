@@ -1,9 +1,68 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
+.app-layout {
+  min-height: 100vh;
 }
 
-.app-container {
-  text-align: center;
+.app-header {
+  background: #1890ff;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.app-title {
+  color: white;
+  margin: 0;
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.app-sider {
+  background: white;
+  border-right: 1px solid #f0f0f0;
+  overflow-y: auto;
+}
+
+.side-tabs {
+  height: 100%;
+}
+
+.side-tabs .ant-tabs-tab {
+  padding: 12px 24px;
+  margin: 0;
+  text-align: left;
+}
+
+.app-content {
+  background: #f5f5f5;
+  padding: 24px;
+  overflow-y: auto;
+}
+
+.content-wrapper {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.query-card,
+.templates-card,
+.result-card {
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+.result-json {
+  background: #f5f5f5;
+  padding: 16px;
+  border-radius: 4px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #333;
+}
+
+.error-alert {
+  margin-top: 16px;
 }

@@ -1,0 +1,39 @@
+groups:
+  - name: one_answer_alerts
+    interval: 30s
+    rules:
+      - alert: BackendDown
+        expr: up{job="one-answer-backend"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Backend service is down"
+          description: "Backend service has been down for more than 1 minute."
+
+      - alert: FrontendDown
+        expr: up{job="one-answer-frontend"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Frontend service is down"
+          description: "Frontend service has been down for more than 1 minute."
+
+      - alert: HighResponseTime
+        expr: http_request_duration_seconds{quantile="0.99"} > 5
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High response time detected"
+          description: "99th percentile response time is above 5 seconds for 5 minutes."
+
+      - alert: HighErrorRate
+        expr: rate(http_requests_total{status=~"5.."}[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High error rate detected"
+          description: "Error rate is above 5% for 5 minutes."

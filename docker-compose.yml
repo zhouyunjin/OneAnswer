@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+    volumes:
+      - ./backend/database.sqlite:/app/database.sqlite
+    networks:
+      - one-answer-network
+
+  frontend:
+    build:
+      context: ./frontend/one-answer-frontend
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - one-answer-network
+
+networks:
+  one-answer-network:
+    driver: bridge

@@ -1,0 +1,23 @@
+modules:
+  semantic_engine:
+    enabled: true
+    model: "qwen"
+    timeout: 5
+  
+  data_service:
+    enabled: true
+    use_mock_data: true
+    cache_enabled: true
+  
+  output_formatter:
+    enabled: true
+    default_format: "json"
+  
+  advanced_query:
+    enabled: false
+  
+  user_auth:
+    enabled: false
+  
+  history_service:
+    enabled: false

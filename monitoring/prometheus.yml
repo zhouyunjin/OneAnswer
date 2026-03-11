@@ -1,0 +1,22 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: 'one-answer-backend'
+    static_configs:
+      - targets: ['backend:3000']
+    metrics_path: '/metrics'
+
+  - job_name: 'one-answer-frontend'
+    static_configs:
+      - targets: ['frontend:80']
+    metrics_path: '/metrics'
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: []
+
+rule_files:
+  - 'alert-rules.yml'
