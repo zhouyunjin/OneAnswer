@@ -64,7 +64,7 @@ chmod +x start.sh stop.sh
 
 服务启动后，可以通过以下地址访问：
 
-- **前端界面**: http://localhost 或 http://<服务器IP>
+- **前端界面**: http://localhost:60001 或 http://<服务器IP>:60001
 - **后端 API**: http://localhost:3000/api
 - **健康检查**: http://localhost:3000/api/health
 
@@ -129,7 +129,7 @@ one-answer-steel-qa-system/
 
 | 服务 | 容器端口 | 主机端口 | 说明 |
 |------|----------|----------|------|
-| 前端 | 80 | 80 | Web 界面 |
+| 前端 | 80 | 60001 | Web 界面 |
 | 后端 | 3000 | 3000 | API 服务 |
 
 ## 🔧 常用操作
@@ -227,7 +227,7 @@ cp data/one-answer.db.backup.xxx data/one-answer.db
 2. **配置防火墙**
    ```bash
    # 仅开放必要端口
-   sudo ufw allow 80/tcp
+   sudo ufw allow 60001/tcp
    sudo ufw allow 3000/tcp
    sudo ufw enable
    ```
@@ -275,6 +275,18 @@ curl http://localhost:3000/api/health
 
 # 检查环境变量
 cat .env | grep LLM
+
+### 端口无法访问
+
+```bash
+# 检查端口是否被占用
+sudo netstat -tlnp | grep 60001
+
+# 检查防火墙设置
+sudo ufw status
+
+# 检查容器端口映射
+docker-compose ps
 ```
 
 ### 容器资源不足
