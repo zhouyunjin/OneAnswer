@@ -10,8 +10,8 @@ RUN apk add --no-cache python3 make g++
 # 复制 package.json 和 package-lock.json
 COPY package*.json ./
 
-# 安装依赖（使用 npm ci，如果失败则重试 3 次）
-RUN for i in 1 2 3; do npm ci --ignore-scripts 2>/dev/null && break || (sleep 5 && if [ $i -eq 3 ]; then npm install --only=production --ignore-scripts; fi); done
+# 安装依赖（使用 --legacy-peer-deps 解决依赖冲突）
+RUN npm install --only=production --legacy-peer-deps
 
 # 复制源代码
 COPY . .
