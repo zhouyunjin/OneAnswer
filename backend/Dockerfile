@@ -10,14 +10,17 @@ RUN apk add --no-cache python3 make g++
 # 复制 package.json 和 package-lock.json
 COPY package*.json ./
 
-# 安装依赖（使用 --legacy-peer-deps 解决依赖冲突）
-RUN npm install --only=production --legacy-peer-deps
+# 安装所有依赖（包括 devDependencies 用于构建）
+RUN npm install --legacy-peer-deps
 
 # 复制源代码
 COPY . .
 
 # 构建 TypeScript
 RUN npm run build
+
+# 安装生产依赖（清理 devDependencies）
+RUN npm prune --production
 
 # 创建数据目录
 RUN mkdir -p /app/data
