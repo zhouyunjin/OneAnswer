@@ -19,6 +19,8 @@ RUN npm run build
 # 生产环境
 FROM nginx:alpine
 
+RUN apk add --no-cache curl
+
 # 复制构建产物到 nginx 目录
 COPY --from=builder /app/dist /usr/share/nginx/html
 

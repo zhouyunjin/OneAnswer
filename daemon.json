@@ -1,0 +1,12 @@
+{
+  "registry-mirrors": [
+    {
+      "domain": "docker.io",
+      "mirror": "https://docker.mirrors.ustc.edu.cn"
+    },
+    {
+      "domain": "registry-1.docker.io",
+      "mirror": "https://docker.mirrors.ustc.edu.cn"
+    }
+  ]
+}

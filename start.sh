@@ -136,7 +136,7 @@ wait_for_services() {
     echo ""
     echo "正在检查前端服务健康状态..."
     for i in {1..30}; do
-        if curl -sf http://localhost &> /dev/null; then
+        if curl -sf http://localhost:60001 &> /dev/null; then
             echo -e "${GREEN}✓ 前端服务已就绪${NC}"
             break
         fi

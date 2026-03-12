@@ -5,7 +5,7 @@ FROM node:20-alpine
 WORKDIR /app
 
 # 安装系统依赖（用于 better-sqlite3）
-RUN apk add --no-cache python3 make g++
+RUN apk add --no-cache python3 make g++ curl
 
 # 复制 package.json 和 package-lock.json
 COPY package*.json ./
