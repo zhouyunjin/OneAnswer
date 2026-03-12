@@ -7,11 +7,11 @@ WORKDIR /app
 # 安装系统依赖（用于 better-sqlite3）
 RUN apk add --no-cache python3 make g++
 
-# 复制 package.json 和 package-lock.json
-COPY package*.json ./
+# 复制 package.json
+COPY package.json ./
 
-# 安装依赖
-RUN npm ci --only=production
+# 安装依赖（使用 npm install 替代 ci，更灵活）
+RUN npm install --only=production
 
 # 复制源代码
 COPY . .
