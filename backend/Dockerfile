@@ -19,9 +19,6 @@ COPY . .
 # 构建 TypeScript
 RUN npm run build
 
-# 安装生产依赖（清理 devDependencies）
-RUN npm prune --production
-
 # 创建数据目录
 RUN mkdir -p /app/data
 
