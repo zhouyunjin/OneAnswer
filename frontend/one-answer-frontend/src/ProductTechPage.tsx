@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
-import { Typography, Button, Space, Tag, Progress, Row, Col } from 'antd'
+import { Typography, Button, Row, Col } from 'antd'
 import { 
-  RocketOutlined, 
   SafetyOutlined, 
   ThunderboltOutlined, 
   RobotOutlined,
@@ -9,22 +8,16 @@ import {
   CloudOutlined,
   BarChartOutlined,
   SettingOutlined,
-  ExperimentOutlined,
   InboxOutlined,
   FireOutlined,
   AlertOutlined,
   DashboardOutlined,
-  FileExcelOutlined,
-  DownloadOutlined,
-  EyeOutlined,
-  PrinterOutlined,
-  CheckCircleOutlined,
   ApiOutlined,
   RightOutlined
 } from '@ant-design/icons'
 import './ProductTechPage.css'
 
-const { Title, Paragraph, Text } = Typography
+const { Title, Paragraph } = Typography
 
 interface ProductTechPageProps {
   onTryNow?: () => void

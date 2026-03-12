@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { Typography, Button, Space, Tag, Progress, Row, Col } from 'antd'
+import { Typography, Button, Progress, Row, Col } from 'antd'
 import { 
   RocketOutlined, 
   SafetyOutlined, 
@@ -13,9 +13,7 @@ import {
   InboxOutlined,
   FireOutlined,
   AlertOutlined,
-  DashboardOutlined,
   FileExcelOutlined,
-  DownloadOutlined,
   EyeOutlined,
   PrinterOutlined,
   CheckCircleOutlined,
@@ -28,7 +26,7 @@ type DocsPageProps = {
   onTryNow?: () => void
 }
 
-const { Title, Paragraph, Text } = Typography
+const { Title, Paragraph } = Typography
 
 interface Slide {
   id: string
@@ -517,7 +515,7 @@ function DocsPage({ onTryNow }: DocsPageProps) {
 
   return (
     <div className="docs-page-minimal" ref={containerRef}>
-      {slides.map((slide, index) => (
+      {slides.map((slide) => (
         <div 
           key={slide.id} 
           className="slide-section"

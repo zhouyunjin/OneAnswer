@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
-import { Layout, Input, Button, Card, Space, Spin, Avatar, Divider, Tag, Tabs, Menu, Collapse } from 'antd'
-import { SendOutlined, LoadingOutlined, UserOutlined, RobotOutlined, FireOutlined, ThunderboltOutlined, AlertOutlined, DashboardOutlined, ExperimentOutlined, InboxOutlined, SettingOutlined, PlaySquareOutlined, BookOutlined, BulbOutlined, FileExcelOutlined, DownloadOutlined, MenuFoldOutlined, MenuUnfoldOutlined, RocketOutlined, FileTextOutlined, CodeOutlined, GlobalOutlined } from '@ant-design/icons'
+import { Layout, Input, Button, Space, Spin, Avatar, Menu, Collapse } from 'antd'
+import { SendOutlined, LoadingOutlined, UserOutlined, RobotOutlined, FireOutlined, ThunderboltOutlined, AlertOutlined, DashboardOutlined, ExperimentOutlined, InboxOutlined, SettingOutlined, PlaySquareOutlined, BookOutlined, BulbOutlined, DownloadOutlined, MenuFoldOutlined, MenuUnfoldOutlined, RocketOutlined, FileTextOutlined, CodeOutlined, GlobalOutlined } from '@ant-design/icons'
 import './App.css'
 import DemoPage from './DemoPage'
 import ProductTechPage from './ProductTechPage'
@@ -495,8 +495,6 @@ function App() {
     },
   ]
 
-  const currentTemplates = templates.filter((t) => t.tab === activeTab)
-
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }
@@ -619,13 +617,6 @@ function App() {
       console.error('Query error:', err)
     } finally {
       setLoading(false)
-    }
-  }
-
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault()
-      handleQuerySubmit()
     }
   }
 

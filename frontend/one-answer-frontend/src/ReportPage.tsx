@@ -211,7 +211,7 @@ function ReportPage() {
     if (exportFormat === 'excel') {
       exportToExcel(reportData, filename)
     } else {
-      exportToPdf(reportData, filename)
+      exportToPdf(reportData)
     }
   }
 
@@ -227,7 +227,7 @@ function ReportPage() {
     link.click()
   }
 
-  const exportToPdf = (data: ReportData[], filename: string) => {
+  const exportToPdf = (data: ReportData[]) => {
     const printContent = document.createElement('div')
     printContent.innerHTML = `
       <style>
@@ -267,7 +267,7 @@ function ReportPage() {
       title: key,
       dataIndex: key,
       key: key,
-      render: (value: any, record: any) => {
+      render: (value: any) => {
         if (key === '进度') {
           return <Progress percent={value} size="small" />
         }

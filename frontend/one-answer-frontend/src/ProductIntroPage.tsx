@@ -1,9 +1,9 @@
 import { useState, useRef, useEffect } from 'react'
-import { Layout, Typography, Button, Space, Card, Row, Col, Divider } from 'antd'
+import { Typography, Button, Space, Card, Row, Col, Divider } from 'antd'
 import { RightOutlined, ThunderboltOutlined, SafetyOutlined, RocketOutlined, CheckCircleOutlined, ArrowRightOutlined } from '@ant-design/icons'
 import './ProductIntroPage.css'
 
-const { Title, Paragraph, Text } = Typography
+const { Title, Paragraph } = Typography
 
 function ProductIntroPage() {
   const [currentSlide, setCurrentSlide] = useState(0)
