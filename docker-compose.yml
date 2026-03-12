@@ -10,13 +10,12 @@ services:
     restart: unless-stopped
     ports:
       - "3000:3000"
+    env_file:
+      - .env
     environment:
       - NODE_ENV=production
       - PORT=3000
       - DB_PATH=/app/data/one-answer.db
-      - LLM_API_KEY=${LLM_API_KEY}
-      - LLM_BASE_URL=${LLM_BASE_URL}
-      - LLM_MODEL=${LLM_MODEL:-minimax-text-01}
     volumes:
       # 数据持久化：SQLite 数据库
       - ./data:/app/data
